@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=${WIDTH}, initial-scale=1"/>
+	<title>Project cs2</title>
+	<style type="text/css">
+		body {
+			background: ${BGCOLOR};
+			text-align: center;
+			margin-top: 10%;
+		}
+		#videoCanvas {
+			/* Always stretch the canvas to 640x480, regardless of its
+			internal size. */
+			width: ${WIDTH}px;
+			height: ${HEIGHT}px;
+		}
+	</style>
+</head>
+<body>
+	<!-- The Canvas size specified here is the "initial" internal resolution. jsmpeg will
+		change this internal resolution to whatever the source provides. The size the
+		canvas is displayed on the website is dictated by the CSS style.
+	-->
+	<canvas id="videoCanvas" width="${WIDTH}" height="${HEIGHT}">
+	</canvas>
+	<script type="text/javascript" src="jsmpg.js"></script>
+	<script type="text/javascript">
+		// Show loading notice
+		var canvas = document.getElementById('videoCanvas');
+		var ctx = canvas.getContext('2d');
+		ctx.fillStyle = '${COLOR}';
+		ctx.fillText('Loading...', canvas.width/2-30, canvas.height/3);
+
+		// Setup the WebSocket connection and start the player
+		var client = new WebSocket('ws://' + window.location.hostname + ':${WS_PORT}/');
+		var player = new jsmpeg(client, {canvas:canvas});
+	</script>
+</body>
+</html>
