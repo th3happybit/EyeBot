@@ -2,9 +2,10 @@ import { Box } from '@material-ui/core';
 import React, { useState } from 'react';
 import { Joystick } from 'react-joystick-component';
 import useWebSocket from 'react-use-websocket';
+import { JOYSTICK_WSS_URL } from '../const';
 
 const JoystickController = () => {
-  const [socketUrl] = useState('ws://3f7672ac3108.ngrok.io/joystick_ws');
+  const [socketUrl] = useState(JOYSTICK_WSS_URL);
   const {
     sendMessage
     // lastMessage,
@@ -21,7 +22,7 @@ const JoystickController = () => {
           move={(arg) => {
             sendMessage(JSON.stringify(arg));
           }}
-        ></Joystick>
+        />
       </Box>
     </div>
   );

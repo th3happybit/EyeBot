@@ -1,9 +1,10 @@
 import { Box, Slider } from '@material-ui/core';
 import React, { useState } from 'react';
 import useWebSocket from 'react-use-websocket';
+import { CAM_WSS_URL } from '../const';
 
 const CamSlider = () => {
-  const [socketUrl] = useState('ws://3f7672ac3108.ngrok.io/joystick_ws');
+  const [socketUrl] = useState(CAM_WSS_URL);
   const {
     sendMessage
     // lastMessage,
