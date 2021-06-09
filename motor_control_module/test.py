@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from AMSpi import AMSpi
+from AMSpi.AMSpi import AMSpi
 import time
 
 if __name__ == '__main__':
