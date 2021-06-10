@@ -5,15 +5,24 @@ from fastapi.responses import HTMLResponse
 from fastapi_mqtt import FastMQTT, MQTTConfig
 import json
 
-from app.core.config import settings
+BACKEND_CORS_ORIGINS=[
+"http://raspberrypi:3000"
+"http://raspberrypi"
+"http://localhost:8000", 
+"https://localhost:8000", 
+"http://localhost", 
+"https://localhost",
+"http://localhost:3000",
+"https://localhost:3000",
+]
 
 
 def get_application():
-    _app = FastAPI(title=settings.PROJECT_NAME)
+    _app = FastAPI(title="raspApi")
 
     _app.add_middleware(
         CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_origins=[str(origin) for origin in BACKEND_CORS_ORIGINS],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
