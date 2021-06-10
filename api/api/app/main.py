@@ -42,7 +42,8 @@ mqtt.init_app(app)
 
 @app.get("/publish")
 async def func():
-    mqtt.publish("/mqtt", "Hello from Fastapi") #publishing mqtt topic
+    mqtt.publish("control/cam/motor", "133") #publishing mqtt topic
+    mqtt.publish("control/base/motor", "90:90")
     return {"result": True,"message":"Published" }
 
 @app.websocket("/joystick_ws")
@@ -51,7 +52,7 @@ async def joystick_websocket_endpoint(websocket: WebSocket):
     while True:
         data = await websocket.receive_json()
         print(data)
-        mqtt.publish("/mqtt", str(data.get("x", 0))+":"+str(data.get("y", 0)))
+        mqtt.publish("control/base/motor", str(data.get("x", 0))+":"+str(data.get("y", 0)))
 
 
 @app.websocket("/camera_ws")
@@ -60,11 +61,12 @@ async def camera_websocket_endpoint(websocket: WebSocket):
     while True:
         data = await websocket.receive_text()
         print(data)
-        mqtt.publish("/mqtt", str(data))
+        mqtt.publish("control/cam/motor", str(data))
 
 @mqtt.on_connect()
 def connect(client, flags, rc, properties):
-    mqtt.client.subscribe("/mqtt") #subscribing mqtt topic
+    mqtt.client.subscribe("control/cam/motor") #subscribing mqtt topic
+    mqtt.client.subscribe("control/base/motor") #subscribing mqtt topic
     print("Connected: ", client, flags, rc, properties)
 
 @mqtt.on_message()
