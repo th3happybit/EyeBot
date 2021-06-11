@@ -27,6 +27,7 @@ password: raspberry
 `echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list`
 `sudo apt update`
 `sudo apt install -y yarn`
+`sudo yarn global add serve`
 
 # config camera
 `sudo raspi-config`
@@ -40,4 +41,12 @@ Upon exiting raspi-config, it will ask to reboot, reboot
 
 # setup project
 
+Install deps for every module
+
 # run services
+sudo cp services/* /etc/systemd/system/
+sudo systemctl start motor_control.service
+sudo systemctl start cam_motor.service
+sudo systemctl start streaming.service
+sudo systemctl start api.service
+sudo systemctl start frontend.service

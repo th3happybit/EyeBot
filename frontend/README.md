@@ -6,4 +6,8 @@
 
 ## run
 
+dev:
 `yarn start`
+
+prod:
+`yarn build`

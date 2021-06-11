@@ -1,0 +1,11 @@
+[Unit]
+Description=frontend service
+
+[Service]
+ExecStart=/usr/local/bin/serve /home/pi/project/frontend/build -p 80
+StandardOutput=file:/home/pi/project/frontend/log/logfile
+StandardError=file:/home/pi/project/frontend/log/logfile
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
