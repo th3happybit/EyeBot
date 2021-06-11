@@ -20,39 +20,33 @@ def move(yspeed, xspeed, motorSpeed):
     # forward right
     if yspeed > deadZone and xspeed > deadZone:
         print('forward right')
-        motor_controller.run_dc_motor(motor_controller.DC_Motor_1, clockwise=False, speed=(motorSpeed-xspeed))
-        motor_controller.run_dc_motor(motor_controller.DC_Motor_4, clockwise=False, speed=motorSpeed)
-        time.sleep(2)
+        motor_controller.run_dc_motor(motor_controller.DC_Motor_1, clockwise=True, speed=(motorSpeed-xspeed))
+        motor_controller.run_dc_motor(motor_controller.DC_Motor_4, clockwise=True, speed=motorSpeed)
     # forward left
     elif yspeed > deadZone and xspeed < -deadZone:
         print('forward left')
-        motor_controller.run_dc_motor(motor_controller.DC_Motor_1, clockwise=False, speed=motorSpeed)
-        motor_controller.run_dc_motor(motor_controller.DC_Motor_4, clockwise=False, speed=(motorSpeed- (-xspeed)))
-        time.sleep(2)
+        motor_controller.run_dc_motor(motor_controller.DC_Motor_1, clockwise=True, speed=motorSpeed)
+        motor_controller.run_dc_motor(motor_controller.DC_Motor_4, clockwise=True, speed=(motorSpeed- (-xspeed)))
     # forward
     elif yspeed > 0 and xspeed < deadZone and xspeed > -deadZone:
         print('forward')
-        motor_controller.run_dc_motor(motor_controller.DC_Motor_1, clockwise=False, speed=motorSpeed)
-        motor_controller.run_dc_motor(motor_controller.DC_Motor_4, clockwise=False, speed=motorSpeed)
-        time.sleep(2)
+        motor_controller.run_dc_motor(motor_controller.DC_Motor_1, clockwise=True, speed=motorSpeed)
+        motor_controller.run_dc_motor(motor_controller.DC_Motor_4, clockwise=True, speed=motorSpeed)
     # back right
     elif yspeed < -deadZone and xspeed > deadZone:
         print('back right')
-        motor_controller.run_dc_motor(motor_controller.DC_Motor_1, clockwise=True, speed=(motorSpeed- xspeed))
-        motor_controller.run_dc_motor(motor_controller.DC_Motor_4, clockwise=True, speed=motorSpeed)
-        time.sleep(2)
+        motor_controller.run_dc_motor(motor_controller.DC_Motor_1, clockwise=False, speed=(motorSpeed- xspeed))
+        motor_controller.run_dc_motor(motor_controller.DC_Motor_4, clockwise=False, speed=motorSpeed)
     # back left
     elif yspeed < -deadZone and xspeed < -deadZone:
         print('back left')
-        motor_controller.run_dc_motor(motor_controller.DC_Motor_1, clockwise=True, speed=motorSpeed)
-        motor_controller.run_dc_motor(motor_controller.DC_Motor_4, clockwise=True, speed=motorSpeed- (-xspeed))
-        time.sleep(2)
+        motor_controller.run_dc_motor(motor_controller.DC_Motor_1, clockwise=False, speed=motorSpeed)
+        motor_controller.run_dc_motor(motor_controller.DC_Motor_4, clockwise=False, speed=motorSpeed- (-xspeed))
     # back
     elif yspeed < -deadZone and xspeed > -deadZone and xspeed < deadZone:
         print('back')
-        motor_controller.run_dc_motor(motor_controller.DC_Motor_1, clockwise=True, speed=motorSpeed)
-        motor_controller.run_dc_motor(motor_controller.DC_Motor_4, clockwise=True, speed=motorSpeed)
-        time.sleep(2)
+        motor_controller.run_dc_motor(motor_controller.DC_Motor_1, clockwise=False, speed=motorSpeed)
+        motor_controller.run_dc_motor(motor_controller.DC_Motor_4, clockwise=False, speed=motorSpeed)
     else:
         print('stop')
         motor_controller.stop_dc_motor(motor_controller.DC_Motor_1)

@@ -2,7 +2,7 @@
 Description=camera streaming service
 
 [Service]
-ExecStart=/usr/bin/python3.9 /home/project/cam_streaming_module/server.py
+ExecStart=/usr/bin/python3 /home/project/cam_streaming_module/server.py
 StandardOutput=file:/home/project/cam_streaming_module/log/logfile
 StandardError=file:/home/project/cam_streaming_module/log/logfile
 Restart=always

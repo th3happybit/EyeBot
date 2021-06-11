@@ -1,7 +1,9 @@
 # api
 
-This project was generated via [manage-fastapi](https://ycd.github.io/manage-fastapi/)! :tada:
+## install
 
-## License
+`sudo pip3 install -r requirements.txt`
 
-This project is licensed under the terms of the MIT license.
+## run
+
+`uvicorn app.main:app --host=0.0.0.0`

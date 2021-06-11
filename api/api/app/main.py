@@ -14,6 +14,7 @@ BACKEND_CORS_ORIGINS=[
 "https://localhost",
 "http://localhost:3000",
 "https://localhost:3000",
+"http://0.0.0.0:3000",
 ]
 
 

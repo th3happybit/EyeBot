@@ -8,6 +8,7 @@ Firstly make sure you've got a functioning Pi camera module (test it with
 installed:
 
     $ sudo apt-get install ffmpeg git python3-picamera python3-ws4py
+    $ sudo pip3 install picamera ws4py
 
 Next, clone this repository:
 

@@ -2,7 +2,7 @@
 Description=motor control service
 
 [Service]
-ExecStart=/usr/bin/python3.9 /home/project/motor_control_module/main.py
+ExecStart=/usr/bin/python3 /home/project/motor_control_module/main.py
 StandardOutput=file:/home/project/motor_control_module/log/logfile
 StandardError=file:/home/project/motor_control_module/log/logfile
 Restart=always
