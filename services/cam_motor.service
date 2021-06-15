@@ -5,7 +5,6 @@ Description=camera motor service
 ExecStart=/usr/bin/python3 /home/pi/project/cam_motor_module/main.py
 StandardOutput=file:/home/pi/project/cam_motor_module/log/logfile
 StandardError=file:/home/pi/project/cam_motor_module/log/logfile
-Restart=always
 
 [Install]
 WantedBy=multi-user.target

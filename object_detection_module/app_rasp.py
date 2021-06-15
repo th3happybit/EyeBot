@@ -68,14 +68,14 @@ whT = 320
 confThreshold = 0.5
 nmsThreshold= 0.3
 
-classesFile = 'data/coco.names'
+classesFile = '/home/pi/project/object_detection_module/data/coco.names'
 classNames = []
 
 with open(classesFile, 'rt') as f:
     classNames = f.read().rstrip('\n').split('\n')
 
-modelConfiguration = 'models/yolov3-tiny.cfg'
-modelWeights = 'models/yolov3-tiny.weights'
+modelConfiguration = '/home/pi/project/object_detection_module/models/yolov3-tiny.cfg'
+modelWeights = '/home/pi/project/object_detection_module/models/yolov3-tiny.weights'
 
 # modelConfiguration = 'models/yolov3.cfg'
 # modelWeights = 'models/yolov3.weights'

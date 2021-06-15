@@ -1,0 +1,10 @@
+[Unit]
+Description=camera streaming service only
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/project/cam_streaming_module/server.py
+StandardOutput=file:/home/pi/project/cam_streaming_module/log/logfile
+StandardError=file:/home/pi/project/cam_streaming_module/log/logfile
+
+[Install]
+WantedBy=multi-user.target

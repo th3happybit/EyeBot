@@ -49,9 +49,6 @@ Upon exiting raspi-config, it will ask to reboot, reboot
 Install deps for every module
 
 # run services
-sudo cp services/* /etc/systemd/system/
-sudo systemctl start motor_control.service
-sudo systemctl start cam_motor.service
-sudo systemctl start streaming.service
-sudo systemctl start api.service
-sudo systemctl start frontend.service
+sudo cp services/*.service /etc/systemd/system/
+sudo systemctl daemon-reload
+bash services/start.sh

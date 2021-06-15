@@ -5,7 +5,6 @@ Description=motor control service
 ExecStart=/usr/bin/python3 /home/pi/project/motor_control_module/main.py
 StandardOutput=file:/home/pi/project/motor_control_module/log/logfile
 StandardError=file:/home/pi/project/motor_control_module/log/logfile
-Restart=always
 
 [Install]
 WantedBy=multi-user.target

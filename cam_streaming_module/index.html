@@ -1,28 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta name="viewport" content="width=${WIDTH}, initial-scale=1"/>
 	<title>Project cs2</title>
-	<style type="text/css">
-		body {
-			background: ${BGCOLOR};
-			text-align: center;
-			margin-top: 10%;
-		}
-		#videoCanvas {
-			/* Always stretch the canvas to 640x480, regardless of its
-			internal size. */
-			width: ${WIDTH}px;
-			height: ${HEIGHT}px;
-		}
-	</style>
 </head>
 <body>
-	<!-- The Canvas size specified here is the "initial" internal resolution. jsmpeg will
-		change this internal resolution to whatever the source provides. The size the
-		canvas is displayed on the website is dictated by the CSS style.
-	-->
-	<canvas id="videoCanvas" width="${WIDTH}" height="${HEIGHT}">
+	<canvas id="videoCanvas" width="100%">
 	</canvas>
 	<script type="text/javascript" src="jsmpg.js"></script>
 	<script type="text/javascript">

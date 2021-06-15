@@ -5,7 +5,6 @@ Description=api service
 ExecStart=/usr/local/bin/uvicorn app.main:app --app-dir=/home/pi/project/api/api --host=0.0.0.0
 StandardOutput=file:/home/pi/project/api/log/logfile
 StandardError=file:/home/pi/project/api/log/logfile
-Restart=always
 
 [Install]
 WantedBy=multi-user.target
