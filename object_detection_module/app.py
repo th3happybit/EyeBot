@@ -4,7 +4,7 @@ import numpy as np
 
 app = Flask(__name__)
 
-camera = cv2.VideoCapture(0)
+# camera = cv2.VideoCapture('/dev/video0')
 whT = 320
 confThreshold = 0.5
 nmsThreshold= 0.3
@@ -52,6 +52,7 @@ def findObjects(outputs,frame):
 
 
 def gen_frames():  
+    camera = cv2.VideoCapture('/dev/video0')
     while True:
         success, frame = camera.read()  # read the camera frame
         if not success:
@@ -77,4 +78,4 @@ def video_feed():
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=8082)

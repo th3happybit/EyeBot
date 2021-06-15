@@ -24,8 +24,9 @@ const CamSlider = () => {
         max={180}
         value={value}
         onChange={(arg, newValue) => {
+          if (newValue !== value){
           setValue(newValue);
-          sendMessage(newValue);
+          sendMessage(180 - newValue);}
         }}
         valueLabelDisplay="auto"
       />

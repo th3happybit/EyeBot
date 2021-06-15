@@ -51,7 +51,6 @@ async def joystick_websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     while True:
         data = await websocket.receive_json()
-        print(data)
         mqtt.publish("control/base/motor", str(data.get("x", 0))+":"+str(data.get("y", 0)))
 
 

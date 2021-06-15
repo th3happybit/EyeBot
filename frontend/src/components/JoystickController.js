@@ -22,6 +22,9 @@ const JoystickController = () => {
           move={(arg) => {
             sendMessage(JSON.stringify(arg));
           }}
+          stop={(arg) => {
+            sendMessage(JSON.stringify({x:'0', y:'0'}));
+          }}
         />
       </Box>
     </div>

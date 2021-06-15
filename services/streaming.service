@@ -2,9 +2,9 @@
 Description=camera streaming service
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/project/cam_streaming_module/server.py
-StandardOutput=file:/home/pi/project/cam_streaming_module/log/logfile
-StandardError=file:/home/pi/project/cam_streaming_module/log/logfile
+ExecStart=/usr/bin/python3 /home/pi/project/object_detection_module/app_rasp.py
+StandardOutput=file:/home/pi/project/object_detection_module/log/logfile
+StandardError=file:/home/pi/project/object_detection_module/log/logfile
 Restart=always
 
 [Install]

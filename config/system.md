@@ -28,6 +28,11 @@ password: raspberry
 `sudo apt update`
 `sudo apt install -y yarn`
 `sudo yarn global add serve`
+`sudo apt-get install python3-opencv`
+`sudo apt-get install pigpio`
+`sudo apt-get install python-pigpio python3-pigpio`
+`sudo systemctl enable pigpiod`
+`sudo systemctl start pigpiod`
 
 # config camera
 `sudo raspi-config`
