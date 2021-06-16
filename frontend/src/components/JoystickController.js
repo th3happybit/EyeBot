@@ -20,10 +20,12 @@ const JoystickController = () => {
           baseColor="#aaa"
           stickColor="#777"
           move={(arg) => {
-            sendMessage(JSON.stringify(arg));
+            sendMessage(
+              JSON.stringify({ x: Math.ceil(arg.x), y: Math.ceil(arg.y) })
+            );
           }}
           stop={() => {
-            sendMessage(JSON.stringify({x:'0', y:'0'}));
+            sendMessage(JSON.stringify({ x: '0', y: '0' }));
           }}
         />
       </Box>
