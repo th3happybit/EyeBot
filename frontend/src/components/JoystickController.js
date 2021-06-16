@@ -22,7 +22,7 @@ const JoystickController = () => {
           move={(arg) => {
             sendMessage(JSON.stringify(arg));
           }}
-          stop={(arg) => {
+          stop={() => {
             sendMessage(JSON.stringify({x:'0', y:'0'}));
           }}
         />

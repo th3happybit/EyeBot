@@ -1,15 +1,18 @@
 import './App.css';
 import React from 'react';
-import JoystickController from './components/JoystickController';
-import CamFeed from './components/CamFeed';
-import CamSlider from './components/CamSlider';
+import { Switch, Route, BrowserRouter as Router } from 'react-router-dom';
+import Stream from './pages/stream';
+import Login from './pages/login';
 
 function App() {
   return (
     <div className="App">
-      <CamFeed />
-      <CamSlider />
-      <JoystickController />
+      <Router>
+        <Switch>
+          <Route path="/stream" exact component={Stream} />
+          <Route path="/" exact component={Login} />
+        </Switch>
+      </Router>
     </div>
   );
 }
