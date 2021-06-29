@@ -21,7 +21,7 @@ const CamFeed = () => {
             onLoad={onLoad}
             src={CAM_SERVER}
             width="100%"
-            height={height + 'px'}
+            height={height}
           />
         </Grid>
         <Grid item xs={false} md={2} lg={3} />
