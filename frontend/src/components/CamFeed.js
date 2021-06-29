@@ -4,10 +4,10 @@ import { CAM_SERVER } from '../const';
 
 const CamFeed = () => {
   const ref = useRef();
-  const [height, setHeight] = useState('600px');
+  const [height] = useState('600px');
 
   const onLoad = () => {
-    setHeight(ref.current.contentWindow.document.body.scrollHeight + 'px');
+    // setHeight(ref.current.contentWindow.document.body.scrollHeight + 'px');
   };
 
   return (
