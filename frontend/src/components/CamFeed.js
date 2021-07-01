@@ -1,31 +1,43 @@
-import { Box, Grid } from '@material-ui/core';
-import React, { useRef, useState } from 'react';
-import { CAM_SERVER } from '../const';
+import { Box } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+import { CAM_SERVER, IFRAME_RATIO } from '../const';
+import useIframeContentHeight from '../utils/useIframeContentHeight';
 
 const CamFeed = () => {
-  const ref = useRef();
-  const [height] = useState('600px');
+  const [
+    iframeRef
+    // iframeHeight
+  ] = useIframeContentHeight();
 
-  const onLoad = () => {
-    // setHeight(ref.current.contentWindow.document.body.scrollHeight + 'px');
+  const [height, setHeight] = useState(IFRAME_RATIO.height);
+
+  const resetheight = () => {
+    let windowWidth = document.getElementById('cam-feed-iframe').clientWidth;
+    setHeight((IFRAME_RATIO.height * windowWidth) / IFRAME_RATIO.width);
   };
 
+  useEffect(() => {
+    window.addEventListener('resize', resetheight);
+
+    return () => {
+      window.removeEventListener('resize', resetheight);
+    };
+  });
+
   return (
-    <Box m={2}>
-      <Grid container>
-        <Grid item xs={false} md={2} lg={3} />
-        <Grid item xs={12} md={8} lg={6}>
-          <iframe
-            title="cam-feed-iframe"
-            ref={ref}
-            onLoad={onLoad}
-            src={CAM_SERVER}
-            width="100%"
-            height={height}
-          />
-        </Grid>
-        <Grid item xs={false} md={2} lg={3} />
-      </Grid>
+    <Box>
+      <iframe
+        ref={iframeRef}
+        // height={iframeHeight}
+        height={height}
+        width="100%"
+        onLoad={resetheight}
+        src={CAM_SERVER}
+        id="cam-feed-iframe"
+        title="cam-feed-iframe"
+        frameBorder="0"
+        allowFullScreen
+      />
     </Box>
   );
 };
