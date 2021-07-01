@@ -7,10 +7,15 @@ import imagezmq
 import argparse
 import imutils
 import pandas as pd
+from storage import RedisStorage, redis_client
+import time 
 
 app = Flask(__name__)
 
 image_hub = imagezmq.ImageHub(open_port='tcp://127.0.0.1:5566')
+
+
+store = RedisStorage()
 
 whT = 320
 confThreshold = 0.5
@@ -55,7 +60,19 @@ def markObjects(name):
             dtString = now.strftime('%H:%M:%S')
             f.writelines(f'\n{name},{dtString}')
 
+def storeObjects(name):
+    try:
+        name = str(name)
+        current_time = time.time()
+        elements = redis_client.lrange("objects", 0, -1)
 
+        if name.encode() not in elements:
+            store.rpush("objects", name)
+            print("Object {} added to redis storage at time {} ".format(name, current_time))
+        else:
+            pass
+    except Exception as e:
+        print(e)
 
 def findObjects(outputs,frame):
     hT, wT, cT = frame.shape
@@ -85,7 +102,7 @@ def findObjects(outputs,frame):
         cv2.rectangle(frame, (x,y), (x+w, y+h), (255,0,255),2)
         cv2.putText(frame,f'{classNames[classIds[i]].upper()} {int(confs[i]*100)}%', 
                     (x,y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255,0,255),2)
-        
+        storeObjects(name)
         markObjects(name)
 
 
