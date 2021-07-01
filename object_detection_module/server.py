@@ -1,11 +1,16 @@
-import io
-import picamera
-import logging
-import socketserver
-from threading import Condition
-from http import server
+from flask import Flask, render_template, Response
 import cv2
 import numpy as np
+from imutils import build_montages
+from datetime import datetime
+import imagezmq
+import argparse
+import imutils
+import pandas as pd
+
+app = Flask(__name__)
+
+image_hub = imagezmq.ImageHub(open_port='tcp://127.0.0.1:5566')
 
 whT = 320
 confThreshold = 0.5
@@ -17,12 +22,40 @@ classNames = []
 with open(classesFile, 'rt') as f:
     classNames = f.read().rstrip('\n').split('\n')
 
-modelConfiguration = 'models/yolov3.cfg'
-modelWeights = 'models/yolov3.weights'
+modelConfiguration = 'models/yolov3-320.cfg'
+modelWeights = 'models/yolov3-320.weights'
 
 net = cv2.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
 net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
 net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+
+# initialize the dictionary which will contain  information regarding
+# when a device was last active, then store the last time the check
+# was made was now
+lastActive = {}
+lastActiveCheck = datetime.now()
+
+# stores the estimated number of Pis, active checking period, and
+# calculates the duration seconds to wait before making a check to
+# see if a device was active
+ESTIMATED_NUM_PIS = 1
+ACTIVE_CHECK_PERIOD = 10
+ACTIVE_CHECK_SECONDS = ESTIMATED_NUM_PIS * ACTIVE_CHECK_PERIOD
+
+filePath = 'Objects.csv'
+def markObjects(name):
+    with open(filePath,'r+') as f:
+        myDataList = f.readlines()
+        nameList = []
+        for line in myDataList:
+            entry = line.split(',')
+            nameList.append(entry[0])
+        if name not in nameList:
+            now = datetime.now()
+            dtString = now.strftime('%H:%M:%S')
+            f.writelines(f'\n{name},{dtString}')
+
+
 
 def findObjects(outputs,frame):
     hT, wT, cT = frame.shape
@@ -48,129 +81,66 @@ def findObjects(outputs,frame):
         i = i[0]
         box = bbox[i]
         x,y,w,h = box[0], box[1], box[2], box[3]
+        name = classNames[classIds[i]].upper()
         cv2.rectangle(frame, (x,y), (x+w, y+h), (255,0,255),2)
         cv2.putText(frame,f'{classNames[classIds[i]].upper()} {int(confs[i]*100)}%', 
                     (x,y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255,0,255),2)
+        
+        markObjects(name)
 
 
-PAGE="""\
-<html>
-<head>
-<title>picamera MJPEG streaming demo</title>
-</head>
-<body>
-<h1>PiCamera MJPEG Streaming Demo</h1>
-<img src="stream.mjpg" width="640" height="480" />
-</body>
-</html>
-"""
-def raw_resolution(resolution, splitter=False):
-    """
-    Round a (width, height) tuple up to the nearest multiple of 32 horizontally
-    and 16 vertically (as this is what the Pi's camera module does for
-    unencoded output).
-    """
-    width, height = resolution
-    if splitter:
-        fwidth = (width + 15) & ~15
-    else:
-        fwidth = (width + 31) & ~31
-    fheight = (height + 15) & ~15
-    return fwidth, fheight
+def gen_frames():  
+    while True:
+
+        (rpiName, frame) = image_hub.recv_image()
+        image_hub.send_reply(b'OK')
+        
+        if rpiName not in lastActive.keys():
+            print("[INFO] receiving data from {}...".format(rpiName))
+        
+        # record the last active time for the device from which we just
+        # received a frame
+        lastActive[rpiName] = datetime.now()
+        cv2.putText(frame, rpiName, (10, 25),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+        #success, frame = camera.read()  # read the camera frame
+        
+        blob = cv2.dnn.blobFromImage(frame, 1/255, (whT, whT), [0,0,0], 1, crop=False)
+        net.setInput(blob)
+        layerNames = net.getLayerNames()
+        outputNames = [layerNames[i[0]-1] for i in net.getUnconnectedOutLayers()]
+        outputs = net.forward(outputNames)
+
+        findObjects(outputs, frame)
+      
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame = buffer.tobytes()
+        yield (b'--frame\r\n'
+            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
     
-def bytes_to_rgb(data, resolution):
-    """
-    Converts a bytes objects containing RGB/BGR data to a `numpy`_ array.
-    """
-    width, height = resolution
-    fwidth, fheight = raw_resolution(resolution)
-    # Workaround: output from the video splitter is rounded to 16x16 instead
-    # of 32x16 (but only for RGB, and only when a resizer is not used)
-    if len(data) != (fwidth * fheight * 3):
-        fwidth, fheight = raw_resolution(resolution, splitter=True)
-        if len(data) != (fwidth * fheight * 3):
-            print('Incorrect buffer length for resolution')
+    
+       
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-    # Crop to the actual resolution
-    return np.frombuffer(data, dtype=np.uint8).\
-            reshape((fheight, fwidth, 3))[:height, :width, :]
+@app.route('/video_feed')
+def video_feed():
+    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-class StreamingOutput(object):
-    def __init__(self):
-        self.frame = None
-        self.buffer = io.BytesIO()
-        self.condition = Condition()
+@app.route('/data')
+def parseCSV():
+    with open('Objects.csv') as csv_file:
+        # CVS Column Names
+        col_names = ['Name','Time']
+        # Use Pandas to parse the CSV file
+        csvData = pd.read_csv(csv_file,names=col_names, header=None)
+        # Loop through the Rows
+    for i,row in csvData.iterrows():
+        print(i,row['Name'],row['Time'])
+   
 
-    def write(self, buf):
-        if buf.startswith(b'\xff\xd8'):
-            # New frame, copy the existing buffer's content and notify all
-            # clients it's available
-            self.buffer.truncate()
-            with self.condition:
-                self.frame = self.buffer.getvalue()
-                self.condition.notify_all()
-            self.buffer.seek(0)
-        return self.buffer.write(buf)
+if __name__ == "__main__":
+    app.run(debug=True, host='127.0.0.1', use_reloader=False)
 
-class StreamingHandler(server.BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == '/':
-            self.send_response(301)
-            self.send_header('Location', '/index.html')
-            self.end_headers()
-        elif self.path == '/index.html':
-            content = PAGE.encode('utf-8')
-            self.send_response(200)
-            self.send_header('Content-Type', 'text/html')
-            self.send_header('Content-Length', len(content))
-            self.end_headers()
-            self.wfile.write(content)
-        elif self.path == '/stream.mjpg':
-            self.send_response(200)
-            self.send_header('Age', 0)
-            self.send_header('Cache-Control', 'no-cache, private')
-            self.send_header('Pragma', 'no-cache')
-            self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
-            self.end_headers()
-            try:
-                while True:
-                    with output.condition:
-                        output.condition.wait()
-                        frame = output.frame
-                        data = np.fromstring(frame, dtype=np.uint8)
-                        image = cv2.imdecode(data, 1)
-                        blob = cv2.dnn.blobFromImage(image, 1/255, (whT, whT), [0,0,0], 1, crop=False)
-                        net.setInput(blob)
-                        layerNames = net.getLayerNames()
-                        outputNames = [layerNames[i[0]-1] for i in net.getUnconnectedOutLayers()]
-                        outputs = net.forward(outputNames)
-                        findObjects(outputs, image)
-                        ret, buffer = cv2.imencode('.jpg', image)
-                        frame = buffer.tobytes()
-                    self.wfile.write(b'--FRAME\r\n')
-                    self.send_header('Content-Type', 'image/jpeg')
-                    self.send_header('Content-Length', len(frame))
-                    self.end_headers()
-                    self.wfile.write(frame)
-                    self.wfile.write(b'\r\n')
-            except Exception as e:
-                logging.warning(
-                    'Removed streaming client %s: %s',
-                    self.client_address, str(e))
-        else:
-            self.send_error(404)
-            self.end_headers()
 
-class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
-    allow_reuse_address = True
-    daemon_threads = True
-                
-with picamera.PiCamera(resolution='640x480', framerate=24) as camera:
-    output = StreamingOutput()
-    camera.start_recording(output, format='mjpeg')
-    try:
-        address = ('0.0.0.0', 8000)
-        server = StreamingServer(address, StreamingHandler)
-        server.serve_forever()
-    finally:
-        camera.stop_recording()
