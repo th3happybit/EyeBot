@@ -36,7 +36,7 @@ print(rpiName)
 #vs = VideoStream(usePiCamera=True).start()
 
 print('Starting.....')
-vs = VideoStream(src=0, framerate=20).start()
+vs = VideoStream(src=0, framerate=10, resolution=(640, 480)).start()
 
 time.sleep(2.0)
 timestamp_of_last_socket_refresh = time.time()

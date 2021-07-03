@@ -12,7 +12,7 @@ import time
 
 app = Flask(__name__)
 
-image_hub = imagezmq.ImageHub(open_port='tcp://127.0.0.1:5566')
+image_hub = imagezmq.ImageHub(open_port='tcp://0.0.0.0:5566')
 
 
 store = RedisStorage()
@@ -160,6 +160,6 @@ def parseCSV():
    
 
 if __name__ == "__main__":
-    app.run(debug=True, host='127.0.0.1', use_reloader=False)
+    app.run(debug=True, host='0.0.0.0', use_reloader=False)
 
 

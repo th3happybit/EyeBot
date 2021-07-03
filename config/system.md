@@ -33,6 +33,7 @@ password: raspberry
 `sudo apt-get install python-pigpio python3-pigpio`
 `sudo systemctl enable pigpiod`
 `sudo systemctl start pigpiod`
+`sudo apt-get install python-picamera python3-picamera`
 
 # config camera
 `sudo raspi-config`
