@@ -65,12 +65,11 @@ def markObjects(name):
 def storeObjects(name):
     try:
         name = str(name)
-        current_time = time.time()
-        elements = redis_client.lrange("objects", 0, -1)
-
-        if name.encode() not in elements:
-            store.rpush("objects", name)
-            print("Object {} added to redis storage at time {} ".format(name, current_time))
+        # current_time = time.time()
+        # elements = redis_client.lrange("objects", 0, -1)
+        if redis_client:
+            redis_client.publish("objects-channel", name)
+            # print("Object {} added to redis storage at time {} ".format(name, current_time))
         else:
             pass
     except Exception as e:
