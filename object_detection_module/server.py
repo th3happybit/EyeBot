@@ -27,8 +27,10 @@ classNames = []
 with open(classesFile, 'rt') as f:
     classNames = f.read().rstrip('\n').split('\n')
 
-modelConfiguration = 'models/yolov3-320.cfg'
-modelWeights = 'models/yolov3-320.weights'
+# modelConfiguration = 'models/yolov3-tiny.cfg'
+# modelWeights = 'models/yolov3-tiny.weights'
+modelConfiguration = 'models/yolov3.cfg'
+modelWeights = 'models/yolov3.weights'
 
 net = cv2.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
 net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)

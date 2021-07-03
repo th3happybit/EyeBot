@@ -4,3 +4,4 @@ imagezmq==1.1.1
 imutils==0.5.4
 pandas==1.2.5
 opencv-python
+redis
