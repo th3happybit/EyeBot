@@ -2,7 +2,7 @@
 Description=camera streaming service
 
 [Service]
-ExecStart=/usr/bin/env FLASK_APP=/home/pi/project/object_detection_module /usr/bin/python3 /home/pi/project/object_detection_module/app_rasp.py
+ExecStart=/usr/bin/python3 /home/pi/project/object_detection_module/client.py
 StandardOutput=file:/home/pi/project/object_detection_module/log/logfile
 StandardError=file:/home/pi/project/object_detection_module/log/logfile
 
