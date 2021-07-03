@@ -12,7 +12,7 @@ import time
 
 app = Flask(__name__)
 
-image_hub = imagezmq.ImageHub(open_port='tcp://127.0.0.1:5566')
+image_hub = imagezmq.ImageHub(open_port='tcp://0.0.0.0:5566')
 
 
 store = RedisStorage()
@@ -33,8 +33,8 @@ modelConfiguration = 'models/yolov3.cfg'
 modelWeights = 'models/yolov3.weights'
 
 net = cv2.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
-net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
-net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
+net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
 # initialize the dictionary which will contain  information regarding
 # when a device was last active, then store the last time the check
@@ -159,6 +159,6 @@ def parseCSV():
    
 
 if __name__ == "__main__":
-    app.run(debug=True, host='127.0.0.1', use_reloader=False)
+    app.run(debug=True, host='0.0.0.0', use_reloader=False)
 
 
