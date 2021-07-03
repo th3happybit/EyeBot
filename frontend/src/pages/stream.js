@@ -17,13 +17,14 @@ import {
   Grid,
   Card
 } from '@material-ui/core';
+import ObjectsList from '../components/ObjectsList';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
     flexWrap: 'nowrap',
-    height: '100vh',
+    // height: '100vh',
     minHeight: '600px'
   },
   container: {
@@ -42,16 +43,15 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(4),
     borderRadius: '20px'
   },
+  objectsContainer: {
+    marginTop: theme.spacing(4),
+    marginLeft: theme.spacing(4),
+    marginRight: theme.spacing(4),
+    borderRadius: '20px'
+  },
   centerElements: {
     display: 'flex',
     justifyContent: 'center'
-  },
-  //  TODO: remove this styles later
-  border: {
-    // border: '5px solid red'
-  },
-  elementBorder: {
-    // border: '5px solid green'
   }
 }));
 
@@ -85,7 +85,7 @@ const Stream = () => {
     <CircularProgress style={{ marginTop: 150 }} />
   ) : (
     <div className={classes.root}>
-      <AppBar className={classes.border} position="static">
+      <AppBar position="static">
         <Toolbar>
           <img src="./logo.png" alt="logo" style={{ height: '50px' }} />
           <Typography variant="h6" className={classes.title}>
@@ -103,15 +103,20 @@ const Stream = () => {
         </Toolbar>
       </AppBar>
       <Grid container className={classes.container}>
-        <Grid item xs={12} md={6} className={classes.border}>
+        <Grid item xs={12} md={6}>
           <Card className={classes.controllersContainer}>
-            <CamFeed className={classes.border} />
+            <CamFeed />
           </Card>
         </Grid>
-        <Grid item xs={12} md={6} className={classes.border}>
+        <Grid item xs={12} md={6}>
           <Card className={classes.controllersContainer}>
-            <JoystickController className={classes.elementBorder} />
-            <CamSlider className={classes.elementBorder} />
+            <JoystickController />
+            <CamSlider />
+          </Card>
+        </Grid>
+        <Grid item xs={12}>
+          <Card className={classes.objectsContainer}>
+            <ObjectsList />
           </Card>
         </Grid>
       </Grid>
@@ -120,8 +125,3 @@ const Stream = () => {
 };
 
 export default Stream;
-
-{
-  /* <CamFeed />
-<JoystickController /> */
-}
