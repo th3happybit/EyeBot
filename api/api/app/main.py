@@ -5,18 +5,20 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi_mqtt import FastMQTT, MQTTConfig
 import json
 import hashlib
-
-BACKEND_CORS_ORIGINS = [
-    "http://raspberrypi:3000"
-    "http://raspberrypi"
-    "http://localhost:8000",
-    "https://localhost:8000",
-    "http://localhost",
-    "https://localhost",
-    "http://localhost:3000",
-    "https://localhost:3000",
-    "http://0.0.0.0:3000",
-]
+import aioredis
+import asyncio
+# BACKEND_CORS_ORIGINS = [
+#     "http://raspberrypi:3000"
+#     "http://raspberrypi"
+#     "http://localhost:8000",
+#     "https://localhost:8000",
+#     "http://localhost",
+#     "https://localhost",
+#     "http://localhost:3000",
+#     "https://localhost:3000",
+#     "http://0.0.0.0:3000",
+#     "http://172.10.20.6"
+# ]
 
 KEY = "1a46f2b7-b2e5-4bfd-a806-5c35c9368aa3"
 
@@ -26,7 +28,7 @@ def get_application():
 
     _app.add_middleware(
         CORSMiddleware,
-        allow_origins=[str(origin) for origin in BACKEND_CORS_ORIGINS],
+        allow_origins=['*'],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -38,7 +40,6 @@ def get_application():
 WHITELIST_ROUTES = ["/auth/", "/docs", "/openapi.json"]
 
 app = get_application()
-
 
 @app.middleware("http")
 async def auth(request: Request, call_next):
@@ -133,3 +134,35 @@ def disconnect(client, packet, exc=None):
 @mqtt.on_subscribe()
 def subscribe(client, mid, qos, properties):
     print("subscribed", client, mid, qos, properties)
+
+async def redis_connector(
+    websocket: WebSocket, redis_uri: str = "redis://localhost:6379"
+):
+    async def producer_handler(r, ws: WebSocket):
+        (channel,) = await r.subscribe("objects-channel")
+        assert isinstance(channel, aioredis.Channel)
+        try:
+            while True:
+                message = await channel.get()
+                print("Received: ",message)
+                if message:
+                    await ws.send_json({ "name": message.decode("utf-8") })
+        except Exception as exc:
+            print(exc)
+
+    redis = await aioredis.create_redis_pool(redis_uri)
+    producer_task = producer_handler(redis, websocket)
+    done, pending = await asyncio.wait(
+        [producer_task], return_when=asyncio.FIRST_COMPLETED,
+    )
+
+    for task in pending:
+        task.cancel()
+    redis.close()
+    await redis.wait_closed()
+    
+
+@app.websocket("/objects_ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    await redis_connector(websocket)
