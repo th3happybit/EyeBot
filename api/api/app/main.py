@@ -136,7 +136,7 @@ def subscribe(client, mid, qos, properties):
     print("subscribed", client, mid, qos, properties)
 
 async def redis_connector(
-    websocket: WebSocket, redis_uri: str = "redis://localhost:6379"
+    websocket: WebSocket, redis_uri: str = "redis://192.168.43.10:6379"
 ):
     async def producer_handler(r, ws: WebSocket):
         (channel,) = await r.subscribe("objects-channel")
