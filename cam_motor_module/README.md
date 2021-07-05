@@ -6,4 +6,4 @@
 
 ## RUN
 
-`sudo pigpiod`
+`python main.py`
