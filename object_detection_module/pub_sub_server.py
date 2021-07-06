@@ -1,20 +1,48 @@
+import threading
+import numpy as np
+from time import sleep
 from flask import Flask, render_template, Response
 import cv2
 import numpy as np
 from imutils import build_montages
 from datetime import datetime
 import imagezmq
-import argparse
 import imutils
 import pandas as pd
 from storage import RedisStorage, redis_client
-import time 
+
+
+class VideoStreamSubscriber:
+
+    def __init__(self, hostname, port):
+        self.hostname = hostname
+        self.port = port
+        self._stop = False
+        self._data_ready = threading.Event()
+        self._thread = threading.Thread(target=self._run, args=())
+        self._thread.daemon = True
+        self._thread.start()
+
+    def receive(self, timeout=15.0):
+        flag = self._data_ready.wait(timeout=timeout)
+        if not flag:
+            raise TimeoutError(
+                "Timeout while reading from subscriber tcp://{}:{}".format(self.hostname, self.port))
+        self._data_ready.clear()
+        return self._data
+
+    def _run(self):
+        receiver = imagezmq.ImageHub("tcp://{}:{}".format(self.hostname, self.port), REQ_REP=False)
+        while not self._stop:
+            self._data = receiver.recv_jpg()
+            self._data_ready.set()
+        receiver.close()
+
+    def close(self):
+        self._stop = True
+
 
 app = Flask(__name__)
-
-image_hub = imagezmq.ImageHub(open_port='tcp://127.0.0.1:5566')
-
-
 store = RedisStorage()
 
 whT = 320
@@ -107,31 +135,31 @@ def findObjects(outputs,frame):
         markObjects(name)
 
 
-def gen_frames():  
+def gen_frames():
+    receiver = VideoStreamSubscriber('172.20.10.6', 5555)
     while True:
 
-        (rpiName, frame) = image_hub.recv_image()
-        image_hub.send_reply(b'OK')
-        
+        rpiName, data = receiver.receive()
+        image = cv2.imdecode(np.frombuffer(data, dtype='uint8'), -1)
         if rpiName not in lastActive.keys():
             print("[INFO] receiving data from {}...".format(rpiName))
         
         # record the last active time for the device from which we just
         # received a frame
         lastActive[rpiName] = datetime.now()
-        cv2.putText(frame, rpiName, (10, 25),
+        cv2.putText(image, rpiName, (10, 25),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
         #success, frame = camera.read()  # read the camera frame
         
-        blob = cv2.dnn.blobFromImage(frame, 1/255, (whT, whT), [0,0,0], 1, crop=False)
+        blob = cv2.dnn.blobFromImage(image, 1/255, (whT, whT), [0,0,0], 1, crop=False)
         net.setInput(blob)
         layerNames = net.getLayerNames()
         outputNames = [layerNames[i[0]-1] for i in net.getUnconnectedOutLayers()]
         outputs = net.forward(outputNames)
 
-        findObjects(outputs, frame)
+        findObjects(outputs, image)
       
-        ret, buffer = cv2.imencode('.jpg', frame)
+        ret, buffer = cv2.imencode('.jpg', image)
         frame = buffer.tobytes()
         yield (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
@@ -159,6 +187,6 @@ def parseCSV():
    
 
 if __name__ == "__main__":
-    app.run(debug=True, host='127.0.0.1', use_reloader=False)
+    app.run(debug=True, host='0.0.0.0', use_reloader=False)
 
 

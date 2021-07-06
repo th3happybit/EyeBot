@@ -26,7 +26,7 @@ def raise_timeout(signum, frame):
 
 # initialize the ImageSender object with the socket address of the
 # server
-sender = imagezmq.ImageSender(connect_to="tcp://127.0.0.1:5566")
+sender = imagezmq.ImageSender(connect_to="tcp://127.0.0.1:5566", REQ_REP = False)
 
 # get the host name, initialize the video stream, and allow the
 # camera sensor to warmup
@@ -36,7 +36,7 @@ print(rpiName)
 #vs = VideoStream(usePiCamera=True).start()
 
 print('Starting.....')
-vs = VideoStream(src=0, framerate=20).start()
+vs = VideoStream(src=0, framerate=32).start()
 
 time.sleep(2.0)
 timestamp_of_last_socket_refresh = time.time()
@@ -55,4 +55,4 @@ while True:
                 time.sleep(6)  # something happened, force a timeout
     except TimeoutError:
         print("Sending timeout.. reconnect to server")
-        sender = imagezmq.ImageSender(connect_to="tcp://{}:5555")
+        sender = imagezmq.ImageSender(connect_to="tcp://127.0.0.1:5555", REQ_REP = False)
